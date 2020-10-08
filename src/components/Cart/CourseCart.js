@@ -2,30 +2,68 @@ import React, { Component } from "react"
 import Img from "gatsby-image"
 import Heading from "../Reusable/Heading"
 
+const getCaty = items => {
+  let holdItems = items.map(item => {
+    return item.node.category
+  })
+  // to remove the repitation, Set has used
+  let holdCategories = new Set(holdItems)
+  // get Array from Set
+  let categories = Array.from(holdCategories)
+
+  categories = ["all", ...categories]
+
+  return categories
+}
+
 export default class CourseCart extends Component {
   constructor(props) {
     super(props)
     this.state = {
       courses: props.courses.edges,
       mycourses: props.courses.edges,
+      mycategories: getCaty(props.courses.edges),
+    }
+  }
+
+  catyClicked = category => {
+    if (category === "all") {
+      this.setState(() => {
+        return { mycourses: this.state.courses }
+      })
+    } else {
+      let holdMe = this.state.courses.filter(
+        ({ node }) => node.category === category
+      )
+      this.setState(() => {
+        return { mycourses: holdMe }
+      })
     }
   }
 
   render() {
-    // console.log(this.state.courses)
-
     return (
-      //   <div>
-      //     <h1>Hey, I'm from course cart</h1>
-      //     <ul>
-      //       {this.state.courses.map(value => (
-      //         <li>{value.node.title}</li>
-      //       ))}
-      //     </ul>
-      //   </div>
       <section className="py-5">
         <div className="container">
           <Heading title="Courses" />
+          <div className="row">
+            <div className="col-10 mx-auto text-center">
+              {this.state.mycategories.map((category, index) => {
+                return (
+                  <button
+                    type="button"
+                    className="btn btn-info m-3 px-3"
+                    key={index}
+                    onClick={() => {
+                      this.catyClicked(category)
+                    }}
+                  >
+                    {category}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
           <div className="row">
             {this.state.mycourses.map(({ node }) => {
               return (
